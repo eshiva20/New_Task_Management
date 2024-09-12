@@ -351,25 +351,14 @@
     const agendaLists = document.querySelector(".agenda_lists");
     const arrow_left = document.querySelector(".arrow_left");
 
-    function fetchMomPoints(pointsDivId) {
-      return fetch("momPoints.html")
+    function fetchContent(url, pointsDivId) {
+      fetch(url)
         .then((response) => response.text())
         .then((html) => {
           document.getElementById(pointsDivId).innerHTML = html;
         })
         .catch((error) => {
-          console.error("Error loading MOM content:", error);
-        });
-    }
-
-    function fetchTaskPoints(pointsDivId) {
-      fetch("taskPoints.html")
-        .then((response) => response.text())
-        .then((html) => {
-          document.getElementById(pointsDivId).innerHTML = html;
-        })
-        .catch((error) => {
-          console.error("Error loading Task content:", error);
+          console.error("Error loading content:", error);
         });
     }
 
@@ -427,8 +416,12 @@
 
         if (form) {
           form.style.display = form.style.display === "none" ? "block" : "none";
-          if (form.style.display === "block" && meeting.momPoints.length > 0) {
-            fetchMomPoints(pointsDivId);
+          if (form.style.display === "block") {
+            if (meeting.momPoints.length > 0) {
+              fetchContent("momPoints.html", pointsDivId);
+            } else if (meeting.tasksPoints.length > 0) {
+              fetchContent("taskPoints.html", pointsDivId);
+            }
           }
         }
       });
@@ -471,19 +464,21 @@
 
         // Set default content to momPoints.html if momPoints are present
         if (meeting.momPoints.length > 0) {
-          fetchMomPoints(pointsDivId);
+          fetchContent("momPoints.html", pointsDivId);
+        } else if (meeting.tasksPoints.length > 0) {
+          fetchContent("taskPoints.html", pointsDivId);
         }
 
         // Event listeners for tags
         momTag.addEventListener("click", () => {
-          fetchMomPoints(pointsDivId);
+          fetchContent("momPoints.html", pointsDivId);
           addTaskBtn.style.display = "none"; // Hide Add Task button for MOM tag
         });
 
         taskTag.addEventListener("click", (e) => {
           e.stopPropagation();
           addTaskBtn.style.display = "block"; // Show Add Task button for Task tag
-          fetchTaskPoints(pointsDivId);
+          fetchContent("taskPoints.html", pointsDivId);
         });
 
         // Add Add Task button to left_div
