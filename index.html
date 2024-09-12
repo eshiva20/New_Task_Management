@@ -719,10 +719,8 @@
               .then((html) => {
                 const body = document.getElementById("body");
 
-                // Insert the HTML content
                 body.innerHTML = html;
 
-                // Find and execute script tags in the inserted HTML
                 const scripts = body.querySelectorAll("script");
                 scripts.forEach((script) => {
                   const newScript = document.createElement("script");
