@@ -418,8 +418,17 @@
           form.style.display = form.style.display === "none" ? "block" : "none";
           if (form.style.display === "block") {
             if (meeting.momPoints.length > 0) {
+              document.querySelector(".mom_tag").className = "tag selected_tag";
+              document
+                .querySelector(".task_tag")
+                .classList.remove("selected_tag");
               fetchContent("momPoints.html", pointsDivId);
             } else if (meeting.tasksPoints.length > 0) {
+              document.querySelector(".task_tag").className =
+                "tag selected_tag";
+              document
+                .querySelector(".mom_tag")
+                .classList.remove("selected_tag");
               fetchContent("taskPoints.html", pointsDivId);
             }
           }
@@ -472,11 +481,15 @@
         // Event listeners for tags
         momTag.addEventListener("click", () => {
           fetchContent("momPoints.html", pointsDivId);
+          momTag.className = "tag selected_tag";
+          taskTag.classList.remove("selected_tag");
           addTaskBtn.style.display = "none"; // Hide Add Task button for MOM tag
         });
 
         taskTag.addEventListener("click", (e) => {
           e.stopPropagation();
+          taskTag.className = "tag selected_tag";
+          momTag.classList.remove("selected_tag");
           addTaskBtn.style.display = "block"; // Show Add Task button for Task tag
           fetchContent("taskPoints.html", pointsDivId);
         });
