@@ -200,9 +200,27 @@
                 color: #20313a;
               }
             }
-            .arrow_down {
+
+            .left_div {
               margin-left: auto;
-              cursor: pointer;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              .add_task {
+                background: #016d24;
+                color: #fff;
+                box-shadow: 1px 1px 3px 0px #002c0ee5;
+                border-radius: 5px;
+                outline: none;
+                border: none;
+                padding: 7px 25px;
+                font-size: 16px;
+                cursor: pointer;
+              }
+              .arrow_down {
+                /* margin-left: auto; */
+                cursor: pointer;
+              }
             }
           }
           .form {
@@ -230,7 +248,7 @@
   <script>
     const meetingAgenda = [
       {
-        date: "14 August, 2024",
+        date: "10 August, 2024",
         day: "Wednesday",
         momPoints: [
           { mom: "Briefly present the total available budget for the period." },
@@ -238,35 +256,19 @@
         tasksPoints: [],
       },
       {
-        date: "15 August, 2024",
+        date: "11 August, 2024",
         day: "Thursday",
         momPoints: [],
         tasksPoints: [],
       },
       {
-        date: "14 August, 2024",
+        date: "12 August, 2024",
         day: "Wednesday",
-        momPoints: [
-          { mom: "Briefly present the total available budget for the period." },
-        ],
-        tasksPoints: [],
-      },
-      {
-        date: "15 August, 2024",
-        day: "Thursday",
         momPoints: [],
-        tasksPoints: [],
+        tasksPoints: [{ task: "New Task by JD" }],
       },
       {
-        date: "14 August, 2024",
-        day: "Wednesday",
-        momPoints: [
-          { mom: "Briefly present the total available budget for the period." },
-        ],
-        tasksPoints: [],
-      },
-      {
-        date: "15 August, 2024",
+        date: "13 August, 2024",
         day: "Thursday",
         momPoints: [],
         tasksPoints: [],
@@ -287,6 +289,20 @@
       },
       {
         date: "16 August, 2024",
+        day: "Wednesday",
+        momPoints: [
+          { mom: "Briefly present the total available budget for the period." },
+        ],
+        tasksPoints: [],
+      },
+      {
+        date: "17 August, 2024",
+        day: "Thursday",
+        momPoints: [],
+        tasksPoints: [],
+      },
+      {
+        date: "18 August, 2024",
         day: "Friday",
         momPoints: [
           { mom: "Briefly present the total available budget for the period." },
@@ -362,16 +378,20 @@
     });
 
     meetingAgenda.forEach((meeting, index) => {
+      // Create meeting container
       const meetingDiv = document.createElement("div");
       meetingDiv.className = "meeting";
 
+      // Create cover div
       const coverDiv = document.createElement("div");
       coverDiv.className = "cover";
 
+      // Create counter
       const counterDiv = document.createElement("div");
       counterDiv.className = "counter";
       counterDiv.textContent = `${index + 1}.`;
 
+      // Create details section
       const detailsDiv = document.createElement("div");
       detailsDiv.className = "details";
 
@@ -386,11 +406,35 @@
       const pointsDiv = document.createElement("div");
       pointsDiv.className = "points_div";
       pointsDiv.id = pointsDivId;
-      pointsDiv.textContent = "Points are available."; // Default text
 
       // Create formDiv
       const formDiv = document.createElement("div");
       formDiv.className = "form";
+
+      // Create Add Task Button
+      const addTaskBtn = document.createElement("button");
+      addTaskBtn.innerText = "Add Task";
+      addTaskBtn.className = "add_task";
+      addTaskBtn.style.display = "none"; // Initially hidden
+
+      // Create arrow down icon
+      const arrowDown = document.createElement("i");
+      arrowDown.className = "fa-solid fa-caret-down arrow_down";
+
+      // Add event listener for cover click
+      coverDiv.addEventListener("click", function () {
+        const form = this.nextElementSibling;
+
+        if (form) {
+          form.style.display = form.style.display === "none" ? "block" : "none";
+          if (form.style.display === "block" && meeting.momPoints.length > 0) {
+            fetchMomPoints(pointsDivId);
+          }
+        }
+      });
+
+      coverDiv.appendChild(counterDiv);
+      coverDiv.appendChild(detailsDiv);
 
       // Handle "No MOM Added" case
       if (meeting.momPoints.length === 0 && meeting.tasksPoints.length === 0) {
@@ -406,12 +450,13 @@
         textarea.rows = "4";
         formDiv.appendChild(textarea);
 
-        // Ensure formDiv is visible when no MOM or tasks
+        // Ensure formDiv is hidden when no MOM or tasks
         formDiv.style.display = "none";
       } else {
+        // Create tags for MOM and Task
         const momTag = document.createElement("span");
         const taskTag = document.createElement("span");
-        momTag.className = "mom_tag tag selected_tag";
+        momTag.className = "mom_tag tag";
         taskTag.className = "task_tag tag";
         momTag.innerHTML = `<i class="fa-solid fa-circle-dot"></i> ${meeting.momPoints.length} MOM`;
         taskTag.innerHTML = `<i class="fa-regular fa-clipboard"></i> ${meeting.tasksPoints.length} Task`;
@@ -432,44 +477,35 @@
         // Event listeners for tags
         momTag.addEventListener("click", () => {
           fetchMomPoints(pointsDivId);
+          addTaskBtn.style.display = "none"; // Hide Add Task button for MOM tag
         });
 
         taskTag.addEventListener("click", (e) => {
           e.stopPropagation();
+          addTaskBtn.style.display = "block"; // Show Add Task button for Task tag
           fetchTaskPoints(pointsDivId);
         });
+
+        // Add Add Task button to left_div
+        const left_div = document.createElement("div");
+        left_div.className = "left_div";
+        left_div.appendChild(addTaskBtn);
+        left_div.appendChild(arrowDown);
+
+        coverDiv.appendChild(left_div);
       }
 
       detailsDiv.appendChild(dateParagraph);
       detailsDiv.appendChild(tagsDiv);
 
-      const arrowDown = document.createElement("i");
-      arrowDown.className = "fa-solid fa-caret-down arrow_down";
-
-      coverDiv.appendChild(counterDiv);
-      coverDiv.appendChild(detailsDiv);
-      coverDiv.appendChild(arrowDown);
-
       meetingDiv.appendChild(coverDiv);
       meetingDiv.appendChild(formDiv); // Append formDiv here
 
+      // Append meetingDiv to agendaLists
       agendaLists.appendChild(meetingDiv);
 
-      coverDiv.addEventListener("click", function () {
-        const form = this.nextElementSibling;
-        if (form) {
-          if (form.style.display === "none") {
-            form.style.display = "block";
-            // If there are momPoints, show them by default
-            if (meeting.momPoints.length > 0) {
-              fetchMomPoints(pointsDivId);
-            }
-          } else {
-            form.style.display = "none";
-          }
-        }
-      });
+      // Debugging: Check if elements are being created correctly
+      console.log(meetingDiv.outerHTML);
     });
-    console.log("MEeeting");
   </script>
 </body>
